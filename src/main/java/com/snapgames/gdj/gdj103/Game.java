@@ -9,9 +9,12 @@
  */
 package com.snapgames.gdj.gdj103;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -28,15 +31,42 @@ public class Game extends JPanel {
 	 */
 	private String title = "game";
 
+	/**
+	 * Game display space dimension
+	 */
 	private Dimension dimension = null;
 
+	/**
+	 * Active window for this Game.
+	 */
 	private Window window;
 
+	/**
+	 * Flag to activate debug information display.
+	 */
+	private boolean debug = true;
+
+	/**
+	 * flag representing the exit request status. true => exit
+	 */
 	private boolean exit = false;
 
+	/**
+	 * Rendering interface.
+	 */
 	private Graphics2D g;
 
+	/**
+	 * Input manager
+	 */
 	private InputHandler inputHandler;
+
+	/**
+	 * List of managed objects.
+	 */
+	private List<GameObject> objects = new ArrayList<>();
+
+	GameObject player = null;
 
 	/**
 	 * the default constructor for the {@link Game} panel with a game
@@ -48,9 +78,7 @@ public class Game extends JPanel {
 	private Game(String title) {
 		this.title = title;
 		this.dimension = new Dimension(640, 400);
-
 		exit = false;
-		g = (Graphics2D) getGraphics();
 		inputHandler = new InputHandler();
 	}
 
@@ -59,17 +87,24 @@ public class Game extends JPanel {
 	 * to render things.
 	 */
 	private void initialize() {
-
+		player = new GameObject("player", WIDTH / 2, HEIGHT / 2, 32, 32, 1, 1, Color.BLUE);
+		objects.add(player);
 	}
 
 	/**
 	 * The main Loop !
 	 */
 	private void loop() {
+		long currentTime = System.currentTimeMillis();
+		long lastTime = currentTime;
 		while (!exit) {
+			currentTime = System.currentTimeMillis();
+			long dt = currentTime - lastTime;
 			input();
-			update();
+			update(dt);
+			g = (Graphics2D) window.frame.getGraphics();
 			render(g);
+			lastTime = currentTime;
 		}
 	}
 
@@ -81,14 +116,31 @@ public class Game extends JPanel {
 		if (inputHandler.getKeyReleased(KeyEvent.VK_ESCAPE)) {
 			setExit(true);
 		}
+		if (inputHandler.getKeyPressed(KeyEvent.VK_UP)) {
+			player.dy = -2;
+		}
+		if (inputHandler.getKeyPressed(KeyEvent.VK_DOWN)) {
+			player.dy = +2;
+		}
+		if (inputHandler.getKeyPressed(KeyEvent.VK_LEFT)) {
+			player.dx = -2;
+		}
+		if (inputHandler.getKeyPressed(KeyEvent.VK_RIGHT)) {
+			player.dx = +2;
+		}
 		inputHandler.clean();
 	}
 
 	/**
 	 * Update game internals
 	 */
-	private void update() {
+	private void update(long dt) {
 
+		if (!objects.isEmpty()) {
+			for (GameObject o : objects) {
+				o.update(dt);
+			}
+		}
 	}
 
 	/**
@@ -97,6 +149,17 @@ public class Game extends JPanel {
 	 * @param g
 	 */
 	private void render(Graphics2D g) {
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, WIDTH, HEIGHT);
+		if (!objects.isEmpty()) {
+			for (GameObject o : objects) {
+				o.draw(g);
+				if (debug) {
+					g.setColor(Color.GREEN);
+					g.drawString(o.name, o.x + o.width + 10, o.y);
+				}
+			}
+		}
 
 	}
 
@@ -104,6 +167,7 @@ public class Game extends JPanel {
 	 * free all resources used by the Game.
 	 */
 	private void release() {
+		objects.clear();
 		window.frame.dispose();
 	}
 
@@ -168,12 +232,12 @@ public class Game extends JPanel {
 	}
 
 	/**
-	 * The main entry point to start our GDJ102 game.
+	 * The main entry point to start our GDJ103 game.
 	 * 
 	 * @param argv
 	 */
 	public static void main(String[] argv) {
-		Game game = new Game("GDJ102");
+		Game game = new Game("GDJ103");
 		Window window = new Window(game);
 		game.run();
 	}
