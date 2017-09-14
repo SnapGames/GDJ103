@@ -3,7 +3,7 @@
  * 
  * Game Development Java
  * 
- * gdj102
+ * gdj103
  * 
  * @year 2017
  */
@@ -11,17 +11,20 @@ package com.snapgames.gdj.gdj103;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Stack;
 
 /**
  * InputHandler
  * 
- * @author frederic
+ * @author Frédéric Delorme
  *
  */
 public class InputHandler implements KeyListener {
 
-	boolean[] keyPressed = new boolean[256];
-	boolean[] keyReleased = new boolean[256];
+	boolean[] keys = new boolean[256];
+	boolean[] keysPrevious = new boolean[256];
+
+	Stack<KeyEvent> events = new Stack<>();
 
 	/*
 	 * (non-Javadoc)
@@ -30,7 +33,6 @@ public class InputHandler implements KeyListener {
 	 */
 	@Override
 	public void keyTyped(KeyEvent e) {
-		System.out.println(String.format("User typed the '%s' key", e.getKeyCode()));
 	}
 
 	/*
@@ -40,8 +42,10 @@ public class InputHandler implements KeyListener {
 	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
-		keyPressed[e.getKeyCode()] = true;
-		System.out.println(String.format("User pressed the '%s' key", e.getKeyCode()));
+
+		events.push(e);
+		keysPrevious[e.getKeyCode()] = keys[e.getKeyCode()];
+		keys[e.getKeyCode()] = true;
 	}
 
 	/*
@@ -51,18 +55,8 @@ public class InputHandler implements KeyListener {
 	 */
 	@Override
 	public void keyReleased(KeyEvent e) {
-		System.out.println(String.format("User released the '%s' key", e.getKeyCode()));
-		keyReleased[e.getKeyCode()] = true;
-	}
-
-	/**
-	 * Clean the internal buffer for key state cache.
-	 */
-	public void clean() {
-		for (int i = 0; i < keyPressed.length; i++) {
-			keyPressed[i] = false;
-			keyReleased[i] = false;
-		}
+		keysPrevious[e.getKeyCode()] = keys[e.getKeyCode()];
+		keys[e.getKeyCode()] = false;
 	}
 
 	/**
@@ -74,7 +68,7 @@ public class InputHandler implements KeyListener {
 	 */
 	public boolean getKeyPressed(int k) {
 		assert (k >= 0 && k < 256);
-		return keyPressed[k];
+		return keys[k];
 	}
 
 	/**
@@ -86,6 +80,14 @@ public class InputHandler implements KeyListener {
 	 */
 	public boolean getKeyReleased(int k) {
 		assert (k >= 0 && k < 256);
-		return keyReleased[k];
+		return keys[k] && !keysPrevious[k];
+	}
+
+	public KeyEvent getEvent() {
+		if (!events.isEmpty()) {
+			return events.pop();
+		} else {
+			return null;
+		}
 	}
 }

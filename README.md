@@ -5,7 +5,7 @@
 ## Game Developement Java Basics 103
 
 This project is part of the [GDJ103](https://classroom.google.com/c/NzI2ODQ3NjU2MFpa/t/NzI2Nzg0MjgxNFpa) course from [GameDev Basics
-Java](https://classroom.google.com/c/NzI2ODQ3NjU2MFpa "Open the official online course") 
+Java](https://classroom.google.com/c/NzI2ODQ3NjU2MFpa "Open the official on-line course") 
 provided by the [SnapGames](http://snapgames.fr) site. 
 
 ### Goal

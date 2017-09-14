@@ -15,7 +15,7 @@ import java.awt.Graphics2D;
 /**
  * GameObject
  * 
- * @author frederic
+ * @author Frédéric Delorme
  *
  */
 public class GameObject {
@@ -23,6 +23,26 @@ public class GameObject {
 	 * internal index to generate the default object name.
 	 */
 	private static int index = 0;
+
+	/**
+	 * default internal constants.
+	 */
+	/**
+	 * default width for any object
+	 */
+	public final static int DEFAULT_WIDTH = 16;
+	/**
+	 * default height for any object
+	 */
+	public final static int DEFAULT_HEIGHT = 16;
+	/**
+	 * default horizontal speed for any object
+	 */
+	public final static float DEFAULT_HSPEED = 0.6f;
+	/**
+	 * default vertical speed for any object
+	 */
+	public final static float DEFAULT_VSPEED = 0.2f;
 	/**
 	 * Name of this object.
 	 */
@@ -30,11 +50,17 @@ public class GameObject {
 	/**
 	 * position of this object onto the display space.
 	 */
-	public int x = 0, y = 0;
+	public float x = 0, y = 0;
+
+	/**
+	 * default speed for this object.
+	 */
+	public float vSpeed, hSpeed;
+
 	/**
 	 * Velocity of this object.
 	 */
-	public int dx = 0, dy = 0;
+	public float dx = 0, dy = 0;
 	/**
 	 * Size of this object.
 	 */
@@ -56,9 +82,9 @@ public class GameObject {
 
 	/**
 	 * Create a GameObject with <code>name</code>, position
-	 * (<code>x</code>,<code>y</code>) size
-	 * (<code>width</code>,<code>height</code>) on a <code>layer</code> width a
-	 * rendering <code>priority</code> and a <code>color</code>.
+	 * (<code>x</code>,<code>y</code>) size (<code>width</code>,<code>height</code>)
+	 * on a <code>layer</code> width a rendering <code>priority</code> and a
+	 * <code>color</code>.
 	 * 
 	 * @param name
 	 *            the name for this object.
@@ -103,31 +129,55 @@ public class GameObject {
 	 */
 	public GameObject(String name, int x, int y, int dx, int dy) {
 		super();
+		// if name is null, generate a default name.
 		this.name = (name == null || name.equals("") ? "noname_" + index : name);
 		this.x = x;
 		this.y = y;
 		this.dx = dx;
 		this.dy = dy;
+		this.width = DEFAULT_WIDTH;
+		this.height = DEFAULT_HEIGHT;
+		this.hSpeed = DEFAULT_HSPEED;
+		this.vSpeed = DEFAULT_VSPEED;
+
 	}
 
-	public void update(long dt) {
+	/**
+	 * Update object position.
+	 * 
+	 * @param game
+	 * @param dt
+	 */
+	public void update(Game game, long dt) {
+		// compute basic physic mechanic
 		x += dx * dt;
 		y += dy * dt;
-		if (x < 0)
-			x = 0;
-		if (y < 0)
-			y = 0;
-		if (x > Game.WIDTH - width)
-			x = Game.WIDTH - width;
-		if (y > Game.HEIGHT - height)
-			y = Game.HEIGHT - height;
+
+		// limit speed
+		if (Math.abs(dx) < 0.01) {
+			dx = 0.0f;
+		}
+		if (Math.abs(dy) < 0.01) {
+			dy = 0.0f;
+		}
+
 	}
 
-	public void draw(Graphics2D g) {
-		if (color != null) {
+	/**
+	 * Draw object
+	 * 
+	 * @param game
+	 * @param g
+	 */
+	public void draw(Game game, Graphics2D g) {
+		
+		// debug purpose, drawn first.
+		if (game.isDebug() && color != null) {
 			g.setColor(color);
+			g.fillRect((int) x, (int) y, width, height);
 		}
-		g.drawRect(x, y, width, height);
+		
+		// Extended object will use their own draw process.
 
 	}
 
@@ -140,62 +190,11 @@ public class GameObject {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("GameObject [name=").append(name).append(", x=").append(x).append(", y=").append(y)
-				.append(", width=").append(width).append(", height=").append(height).append(", layer=").append(layer)
-				.append(", priority=").append(priority).append("]");
+				.append(", vSpeed=").append(vSpeed).append(", hSpeed=").append(hSpeed).append(", dx=").append(dx)
+				.append(", dy=").append(dy).append(", width=").append(width).append(", height=").append(height)
+				.append(", layer=").append(layer).append(", priority=").append(priority).append(", color=")
+				.append(color).append("]");
 		return builder.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + height;
-		result = prime * result + layer;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + priority;
-		result = prime * result + width;
-		result = prime * result + (int) (x ^ (x >>> 32));
-		result = prime * result + (int) (y ^ (y >>> 32));
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GameObject other = (GameObject) obj;
-		if (height != other.height)
-			return false;
-		if (layer != other.layer)
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (priority != other.priority)
-			return false;
-		if (width != other.width)
-			return false;
-		if (x != other.x)
-			return false;
-		if (y != other.y)
-			return false;
-		return true;
 	}
 
 }

@@ -3,7 +3,7 @@
  * 
  * Game Development Java
  * 
- * gdj102
+ * gdj103
  * 
  * @year 2017
  */
@@ -16,7 +16,7 @@ import javax.swing.JFrame;
 /**
  * the {@link Window} class to contains and display all the game.
  * 
- * @author frederic
+ * @author Frédéric Delorme
  *
  */
 public class Window {
