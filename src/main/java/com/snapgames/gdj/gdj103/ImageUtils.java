@@ -58,7 +58,7 @@ public class ImageUtils {
 	public static void record(BufferedImage image) {
 		try {
 			java.io.File out = new java.io.File(
-					path + File.separator + "sequence_" + seqCount + "_frame_" + recordingCount + ".gif");
+					path + File.separator + "sequence_" + seqCount + "_frame_" + recordingCount + ".jpg");
 			javax.imageio.ImageIO.write(image, "JPG", out);
 			recordingCount++;
 		} catch (Exception e) {

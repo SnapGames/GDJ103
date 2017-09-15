@@ -10,8 +10,22 @@ provided by the [SnapGames](http://snapgames.fr) site.
 
 ### Goal
 
-*TODO*
+The goal of this sample is to demonstrate usage of GameObject and layers, to render multiple objects on screen with a layer depth of rendering.
 
+<figure>
+  <img src="./src/main/resources/gdj103-sample.jpg" title="Sample GDJ103 some game objects"/>
+  <figcaption>figure 1 - the default display for this sample.</figcaption>
+</figure>
+
+<figure>
+  <img src="./src/main/resources/gdj103-sample-debug-mode.jpg" title="debug mode display information about GameObject's"/>
+  <figcaption>figure 2 - the default display for this sample.</figcaption>
+</figure>
+
+<figure>
+  <img src="./src/main/resources/gdj103-sample-pause-mode.jpg" title="Pause mode"/>
+  <figcaption>figure 3 - the default display for this sample.</figcaption>
+</figure>
 
 ## Compile
 
@@ -34,6 +48,8 @@ or :
 
 Import this project as an Existing Maven Project into your prefered IDE, 
 (like [Eclipse](http://www.eclipse.org/downloads "open the eclipse official web download page") ?)
+
+
 
 
 Have Fun !

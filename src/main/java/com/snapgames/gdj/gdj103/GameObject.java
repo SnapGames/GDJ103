@@ -171,12 +171,8 @@ public class GameObject {
 	 */
 	public void draw(Game game, Graphics2D g) {
 		
-		// debug purpose, drawn first.
-		if (game.isDebug() && color != null) {
-			g.setColor(color);
-			g.fillRect((int) x, (int) y, width, height);
-		}
-		
+		g.setColor(color);
+		g.fillRect((int) x, (int) y, width, height);
 		// Extended object will use their own draw process.
 
 	}
