@@ -117,7 +117,7 @@ public class Game extends JPanel {
 	 */
 	private void initialize() {
 
-		// internal display buffer
+		// Internal display buffer
 		image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
 		g = image.createGraphics();
 
@@ -125,8 +125,8 @@ public class Game extends JPanel {
 		player = new GameObject("player", getWidth() / 2, getHeight() / 2, 32, 32, 1, 1, Color.BLUE);
 		player.hSpeed = 0.6f;
 		player.vSpeed = 0.3f;
-		player.priority=1;
-		player.layer=1;
+		player.priority = 1;
+		player.layer = 1;
 		addObject(player);
 
 		for (int i = 0; i < 10; i++) {
@@ -313,15 +313,15 @@ public class Game extends JPanel {
 	 * @param o
 	 */
 	private void drawDebug(Graphics2D g, GameObject o) {
-		g.setColor(new Color(0.5f,.5f,.5f,.8f));
-		g.fillRect((int)o.x + o.width + 6, (int)o.y-8, 150, 50);
+		g.setColor(new Color(0.5f, .5f, .5f, .8f));
+		g.fillRect((int) o.x + o.height + 6, (int) o.y - 16, 150, 4 * 16+8);
 		g.setColor(Color.YELLOW);
-		g.drawRect((int) o.x, (int) o.y, o.width, o.height);		
-		g.drawRect((int)o.x + o.width + 6, (int)o.y-8, 150, 50);
-		//g.setColor(Color.BLACK);
+		g.drawRect((int) o.x, (int) o.y, o.width, o.height);
+		g.drawRect((int) o.x + o.width + 6, (int) o.y - 16, 150, 4 * 16+8);
 		g.drawString(o.name, o.x + o.width + 10, o.y);
 		g.drawString("pos(" + o.x + "," + o.y + ")", o.x + o.width + 10, o.y + 16);
 		g.drawString("spd(" + o.dx + "," + o.dy + ")", o.x + o.width + 10, o.y + 32);
+		g.drawString("lyr,prio(" + o.layer + "," + o.priority + ")", o.x + o.width + 10, o.y + 48);
 	}
 
 	/**
