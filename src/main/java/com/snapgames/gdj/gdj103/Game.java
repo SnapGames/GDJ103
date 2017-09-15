@@ -11,6 +11,7 @@ package com.snapgames.gdj.gdj103;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -70,6 +71,11 @@ public class Game extends JPanel {
 	private boolean pause = false;
 
 	/**
+	 * Flag to display Help.
+	 */
+	private boolean help = false;
+
+	/**
 	 * Flag to activate screenshot recording.
 	 */
 	private boolean screenshot = false;
@@ -84,6 +90,8 @@ public class Game extends JPanel {
 	 */
 	private InputHandler inputHandler;
 
+	private boolean[] layers = new boolean[3];
+
 	/**
 	 * List of managed objects.
 	 */
@@ -93,9 +101,11 @@ public class Game extends JPanel {
 	 * objects to be animated on the game display.
 	 */
 	// Object moved by player
-	GameObject player = null;
+	private GameObject player = null;
 	// list of other entities to demonstrate GameObject usage.
 	private List<GameObject> entities = new ArrayList<>();
+
+	private Font font;
 
 	/**
 	 * the default constructor for the {@link Game} panel with a game
@@ -121,6 +131,8 @@ public class Game extends JPanel {
 		image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
 		g = image.createGraphics();
 
+		font = g.getFont();
+
 		// prepare Game objects
 		player = new GameObject("player", getWidth() / 2, getHeight() / 2, 32, 32, 1, 1, Color.BLUE);
 		player.hSpeed = 0.6f;
@@ -129,10 +141,16 @@ public class Game extends JPanel {
 		player.layer = 1;
 		addObject(player);
 
+		for (int i = 0; i < 3; i++) {
+			layers[i] = true;
+		}
+
 		for (int i = 0; i < 10; i++) {
+
 			GameObject entity = new GameObject("entity_" + i, getWidth() / 2, getHeight() / 2, 32, 32, 1, 1, Color.RED);
-			entity.dx = ((float) Math.random() / 2) - 0.2f;
-			entity.dy = ((float) Math.random() / 2) - 0.2f;
+			entity.dx = ((float) Math.random() / 2) - 0.1f;
+			entity.dy = ((float) Math.random() / 2) - 0.1f;
+
 			if (i < 5) {
 				entity.layer = 2;
 				entity.color = Color.MAGENTA;
@@ -142,6 +160,7 @@ public class Game extends JPanel {
 			}
 			entities.add(entity);
 			addObject(entity);
+
 		}
 	}
 
@@ -205,6 +224,14 @@ public class Game extends JPanel {
 	 * Manage Game input.
 	 */
 	private void input() {
+		inputGame();
+		inputPlayer(player);
+	}
+
+	/**
+	 * Manage Input at game level.
+	 */
+	private void inputGame() {
 		// Process keys
 		KeyEvent k = inputHandler.getEvent();
 		if (k != null) {
@@ -221,14 +248,33 @@ public class Game extends JPanel {
 			case KeyEvent.VK_D:
 				debug = !debug;
 				break;
+			case KeyEvent.VK_H:
+				help = !help;
+				break;
 			case KeyEvent.VK_S:
 				screenshot = true;
+				break;
+			case KeyEvent.VK_NUMPAD1:
+				layers[0] = !layers[0];
+				break;
+			case KeyEvent.VK_NUMPAD2:
+				layers[1] = !layers[1];
+				break;
+			case KeyEvent.VK_NUMPAD3:
+				layers[2] = !layers[2];
 				break;
 			default:
 				break;
 			}
 		}
+	}
 
+	/**
+	 * Manage input for Player.
+	 * 
+	 * @param player
+	 */
+	private void inputPlayer(GameObject player) {
 		// left / right
 		if (inputHandler.getKeyPressed(KeyEvent.VK_LEFT)) {
 			player.dx = -player.hSpeed;
@@ -251,11 +297,12 @@ public class Game extends JPanel {
 				player.dy *= 0.980f;
 			}
 		}
-
 	}
 
 	/**
 	 * Update game internals
+	 * 
+	 * @param dt
 	 */
 	private void update(long dt) {
 
@@ -263,21 +310,27 @@ public class Game extends JPanel {
 			o.update(this, dt);
 		}
 
+		int winborder = 16;
+		int wl = winborder;
+		int wr = this.getWidth() - player.width - winborder;
+		int wt = winborder;
+		int wb = this.getHeight() - player.height - winborder;
+
 		// player limit to border window
-		if (player.x < 0)
-			player.x = 0;
-		if (player.y < 0)
-			player.y = 0;
-		if (player.x > this.getWidth() - player.width)
-			player.x = this.getWidth() - player.width;
-		if (player.y > this.getHeight() - player.height)
-			player.y = this.getHeight() - player.height;
+		if (player.x < wl)
+			player.x = wl;
+		if (player.y < wt)
+			player.y = wt;
+		if (player.x > wr)
+			player.x = wr;
+		if (player.y > wb)
+			player.y = wb;
 
 		for (GameObject o : entities) {
-			if (o.x <= 1 || o.x >= this.getWidth() - o.width) {
+			if (o.x <= wl || o.x >= wr) {
 				o.dx = -Math.signum(o.dx) * o.hSpeed;
 			}
-			if (o.y <= 1 || o.y >= this.getHeight() - o.height) {
+			if (o.y <= wt || o.y >= wb) {
 				o.dy = -Math.signum(o.dy) * o.vSpeed;
 			}
 		}
@@ -290,38 +343,36 @@ public class Game extends JPanel {
 	 */
 	private void render(Graphics2D g) {
 		// clear display
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, getWidth(), getHeight());
+		clearBuffer(g);
 
 		if (!objects.isEmpty()) {
 			for (GameObject o : objects) {
-				o.draw(this, g);
-				if (debug) {
-					drawDebug(g, o);
+				if (layers[o.layer - 1]) {
+					o.draw(this, g);
+					if (debug) {
+						RenderHelper.drawDebug(g, o);
+					}
 				}
 			}
 		}
 
+		// Display Pause state
 		if (pause) {
 			drawPause(g);
 		}
 
+		// display Help if requested
+		if (help) {
+			RenderHelper.displayHelp(this, g, 10, 20);
+		}
 	}
 
 	/**
 	 * @param g
-	 * @param o
 	 */
-	private void drawDebug(Graphics2D g, GameObject o) {
-		g.setColor(new Color(0.5f, .5f, .5f, .8f));
-		g.fillRect((int) o.x + o.height + 6, (int) o.y - 16, 150, 4 * 16+8);
-		g.setColor(Color.YELLOW);
-		g.drawRect((int) o.x, (int) o.y, o.width, o.height);
-		g.drawRect((int) o.x + o.width + 6, (int) o.y - 16, 150, 4 * 16+8);
-		g.drawString(o.name, o.x + o.width + 10, o.y);
-		g.drawString("pos(" + o.x + "," + o.y + ")", o.x + o.width + 10, o.y + 16);
-		g.drawString("spd(" + o.dx + "," + o.dy + ")", o.x + o.width + 10, o.y + 32);
-		g.drawString("lyr,prio(" + o.layer + "," + o.priority + ")", o.x + o.width + 10, o.y + 48);
+	private void clearBuffer(Graphics2D g) {
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, getWidth(), getHeight());
 	}
 
 	/**
@@ -331,6 +382,11 @@ public class Game extends JPanel {
 	 */
 	private void drawPause(Graphics2D g) {
 		String lblPause = "Pause";
+
+		Font bck = g.getFont();
+		Font f = font.deriveFont(28.0f).deriveFont(Font.ITALIC);
+
+		g.setFont(f);
 		int lblWidth = g.getFontMetrics().stringWidth(lblPause);
 		int lblHeight = g.getFontMetrics().getHeight();
 		int yPos = (getHeight() - lblHeight) / 2;
@@ -342,6 +398,7 @@ public class Game extends JPanel {
 		g.setColor(Color.WHITE);
 		g.getFontMetrics().getHeight();
 		g.drawString(lblPause, (getWidth() - lblWidth) / 2, (getHeight() - lblHeight) / 2);
+		g.setFont(bck);
 
 	}
 
@@ -421,6 +478,27 @@ public class Game extends JPanel {
 	 */
 	public boolean isDebug() {
 		return debug;
+	}
+
+	/**
+	 * @return the pause
+	 */
+	public boolean isPause() {
+		return pause;
+	}
+
+	/**
+	 * @return the help
+	 */
+	public boolean isHelp() {
+		return help;
+	}
+
+	/**
+	 * @return the layers
+	 */
+	public boolean[] getLayers() {
+		return layers;
 	}
 
 	/**
