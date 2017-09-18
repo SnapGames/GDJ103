@@ -43,6 +43,8 @@ public class GameObject {
 	 * default vertical speed for any object
 	 */
 	public final static float DEFAULT_VSPEED = 0.2f;
+
+	public static final float GRAVITY = 0.981f;
 	/**
 	 * Name of this object.
 	 */
@@ -61,6 +63,14 @@ public class GameObject {
 	 * Velocity of this object.
 	 */
 	public float dx = 0, dy = 0;
+
+	/**
+	 * Some physic parameters
+	 */
+	public float elasticity = 1.4f;
+	public float rugosity = 0.8f;
+	public float mass = 10.0f;
+	
 	/**
 	 * Size of this object.
 	 */
@@ -151,7 +161,7 @@ public class GameObject {
 	public void update(Game game, long dt) {
 		// compute basic physic mechanic
 		x += dx * dt;
-		y += dy * dt;
+		y += dy * dt +(GameObject.GRAVITY*mass*elasticity*rugosity)*((dt)*0.8);
 
 		// limit speed
 		if (Math.abs(dx) < 0.01) {
@@ -170,7 +180,7 @@ public class GameObject {
 	 * @param g
 	 */
 	public void draw(Game game, Graphics2D g) {
-		
+
 		g.setColor(color);
 		g.fillRect((int) x, (int) y, width, height);
 		// Extended object will use their own draw process.

@@ -149,12 +149,8 @@ public class Game extends JPanel {
 
 		for (int i = 0; i < 10; i++) {
 
-			GameObject entity = new GameObject(
-					"entity_" + i, 
-					getWidth() / (2 * SCALE), getHeight() / (2 * SCALE), 
-					16,	16, 
-					1, 1, 
-					Color.RED);
+			GameObject entity = new GameObject("entity_" + i, getWidth() / (2 * SCALE), getHeight() / (2 * SCALE), 16,
+					16, 1, 1, Color.RED);
 			entity.dx = ((float) Math.random() * 0.1f) - 0.05f;
 			entity.dy = ((float) Math.random() * 0.1f) - 0.05f;
 
@@ -262,12 +258,15 @@ public class Game extends JPanel {
 				screenshot = true;
 				break;
 			case KeyEvent.VK_NUMPAD1:
+			case KeyEvent.VK_1:
 				layers[0] = !layers[0];
 				break;
 			case KeyEvent.VK_NUMPAD2:
+			case KeyEvent.VK_2:
 				layers[1] = !layers[1];
 				break;
 			case KeyEvent.VK_NUMPAD3:
+			case KeyEvent.VK_3:
 				layers[2] = !layers[2];
 				break;
 			default:
@@ -322,7 +321,7 @@ public class Game extends JPanel {
 		int wr = (this.getWidth() / SCALE) - player.width - winborder;
 		int wt = winborder;
 		int wb = (this.getHeight() / SCALE) - player.height - winborder;
-
+		
 		// player limit to border window
 		if (player.x < wl)
 			player.x = wl;
@@ -338,7 +337,7 @@ public class Game extends JPanel {
 				o.dx = -Math.signum(o.dx) * o.hSpeed;
 			}
 			if (o.y <= wt || o.y >= wb) {
-				o.dy = -Math.signum(o.dy) * o.vSpeed;
+				o.dy = -Math.signum(o.dy);
 			}
 		}
 	}
