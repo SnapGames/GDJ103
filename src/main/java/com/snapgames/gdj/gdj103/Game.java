@@ -102,6 +102,7 @@ public class Game extends JPanel {
 	 */
 	// Object moved by player
 	private GameObject player = null;
+	
 	// list of other entities to demonstrate GameObject usage.
 	private List<GameObject> entities = new ArrayList<>();
 
