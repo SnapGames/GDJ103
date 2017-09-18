@@ -5,6 +5,7 @@ package com.snapgames.gdj.gdj103;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 
 /**
@@ -12,6 +13,11 @@ import java.awt.Graphics2D;
  *
  */
 public class RenderHelper {
+
+	public enum TextPosition {
+		LEFT, RIGHT, CENTER
+	}
+
 	/**
 	 * Display Help message.
 	 * 
@@ -39,9 +45,39 @@ public class RenderHelper {
 		drawShadowString(g, "   Q/ESCAPE: Escape the demo", x, y + 112, Color.WHITE, Color.BLACK);
 	}
 
-	private static String showBoolean(boolean b) {
+	public static void display(Graphics2D g, int x, int y, Font f, Object[] objects) {
+		String[] helps = new String[objects.length];
+		g.setFont(f);
+		FontMetrics fm = g.getFontMetrics();
+		int maxWidth = 0;
+		for (Object o : objects) {
+			int strWidth = g.getFontMetrics().stringWidth(o.toString());
+			if (strWidth > maxWidth) {
+				maxWidth = strWidth;
+			}
 
-		return (b ? "X" : "_");
+		}
+		g.setColor(new Color(.5f, .5f, .5f, .3f));
+		g.fillRect(x - 10, y - fm.getHeight(), (maxWidth + 2 * 16), (objects.length + 1) * fm.getHeight());
+		g.setColor(Color.WHITE);
+
+		int i = 0;
+		for (Object o : objects) {
+			helps[i] = o.toString();
+			drawShadowString(g, helps[i], x + 5, y + i * fm.getHeight(), Color.WHITE, Color.BLACK);
+			i++;
+		}
+
+	}
+
+	public static String showBoolean(boolean b) {
+
+		return showBoolean(b, "X", "_");
+	}
+
+	public static String showBoolean(boolean b, String on, String off) {
+
+		return (b ? on : off);
 	}
 
 	/**
@@ -55,6 +91,34 @@ public class RenderHelper {
 	 * @param back
 	 */
 	public static void drawShadowString(Graphics2D g, String text, int x, int y, Color front, Color back) {
+		drawShadowString(g, text, x, y, front, back, TextPosition.LEFT);
+	}
+
+	/**
+	 * Display String with front and back color.
+	 * 
+	 * @param g
+	 * @param text
+	 * @param x
+	 * @param y
+	 * @param front
+	 * @param back
+	 */
+	public static void drawShadowString(Graphics2D g, String text, int x, int y, Color front, Color back,
+			TextPosition txtPos) {
+		int textWidth = g.getFontMetrics().stringWidth(text);
+		int textHeight = g.getFontMetrics().getHeight();
+		switch (txtPos) {
+		case LEFT:
+			x = x;
+			break;
+		case RIGHT:
+			x = x - textWidth;
+			break;
+		case CENTER:
+			x = x - (textWidth / 2);
+			break;
+		}
 		g.setColor(back);
 		g.drawString(text, x - 1, y + 1);
 		g.drawString(text, x - 1, y - 1);
@@ -91,8 +155,10 @@ public class RenderHelper {
 		g.drawLine((int) o.x + o.width, (int) o.y + o.height, (int) pane_x + link, pane_y + link);
 
 		g.drawString(o.name, pane_x + link + pane_padding, pane_y + link + fontHeight);
-		g.drawString(String.format("pos:(%4.2f,%4.2f)", o.x, o.y), pane_x + link + pane_padding, pane_y + link + 2 * fontHeight);
-		g.drawString(String.format("spd:(%4.2f,%4.2f)", o.dx, o.dy), pane_x + link + pane_padding, pane_y + link + 3 * fontHeight);
+		g.drawString(String.format("pos:(%4.2f,%4.2f)", o.x, o.y), pane_x + link + pane_padding,
+				pane_y + link + 2 * fontHeight);
+		g.drawString(String.format("spd:(%4.2f,%4.2f)", o.dx, o.dy), pane_x + link + pane_padding,
+				pane_y + link + 3 * fontHeight);
 		g.drawString(String.format("lyr,prio(:(%d,%d)", o.layer, o.priority), pane_x + link + pane_padding,
 				pane_y + link + 4 * fontHeight);
 	}
