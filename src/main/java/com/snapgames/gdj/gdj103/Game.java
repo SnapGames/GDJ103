@@ -28,7 +28,6 @@ import javax.swing.JPanel;
  * @author Frédéric Delorme
  *
  */
-@SuppressWarnings("serial")
 public class Game extends JPanel {
 
 	public final static int WIDTH = 320;
