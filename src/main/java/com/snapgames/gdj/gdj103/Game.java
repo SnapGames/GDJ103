@@ -32,8 +32,8 @@ import javax.swing.JPanel;
 public class Game extends JPanel {
 
 	public final static int WIDTH = 320;
-	public final static int HEIGHT = 200;
-	public final static int SCALE = 2;
+	public final static int HEIGHT = (WIDTH * 9 / 16);
+	public final static int SCALE = 3;
 
 	/**
 	 * The title for the game instance.
@@ -105,7 +105,7 @@ public class Game extends JPanel {
 	// list of other entities to demonstrate GameObject usage.
 	private List<GameObject> entities = new ArrayList<>();
 
-	private Font font;
+	private Font font, debugFont;
 
 	/**
 	 * the default constructor for the {@link Game} panel with a game
@@ -128,15 +128,17 @@ public class Game extends JPanel {
 	private void initialize() {
 
 		// Internal display buffer
-		image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		g = image.createGraphics();
 
 		font = g.getFont();
+		debugFont = g.getFont().deriveFont(9f);
 
 		// prepare Game objects
-		player = new GameObject("player", getWidth() / 2, getHeight() / 2, 32, 32, 1, 1, Color.BLUE);
-		player.hSpeed = 0.6f;
-		player.vSpeed = 0.3f;
+		player = new GameObject("player", getWidth() / (2 * SCALE), getHeight() / (2 * SCALE), 16, 16, 1, 1,
+				Color.BLUE);
+		player.hSpeed = 0.2f;
+		player.vSpeed = 0.1f;
 		player.priority = 1;
 		player.layer = 1;
 		addObject(player);
@@ -147,9 +149,14 @@ public class Game extends JPanel {
 
 		for (int i = 0; i < 10; i++) {
 
-			GameObject entity = new GameObject("entity_" + i, getWidth() / 2, getHeight() / 2, 32, 32, 1, 1, Color.RED);
-			entity.dx = ((float) Math.random() / 2) - 0.1f;
-			entity.dy = ((float) Math.random() / 2) - 0.1f;
+			GameObject entity = new GameObject(
+					"entity_" + i, 
+					getWidth() / (2 * SCALE), getHeight() / (2 * SCALE), 
+					16,	16, 
+					1, 1, 
+					Color.RED);
+			entity.dx = ((float) Math.random() * 0.1f) - 0.05f;
+			entity.dy = ((float) Math.random() * 0.1f) - 0.05f;
 
 			if (i < 5) {
 				entity.layer = 2;
@@ -211,7 +218,7 @@ public class Game extends JPanel {
 
 		// copy buffer to window.
 		Graphics g2 = this.getGraphics();
-		g2.drawImage(image, 0, 0, null);
+		g2.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, 0, 0, WIDTH, HEIGHT, Color.BLACK, null);
 		g2.dispose();
 
 		if (screenshot) {
@@ -312,9 +319,9 @@ public class Game extends JPanel {
 
 		int winborder = 16;
 		int wl = winborder;
-		int wr = this.getWidth() - player.width - winborder;
+		int wr = (this.getWidth() / SCALE) - player.width - winborder;
 		int wt = winborder;
-		int wb = this.getHeight() - player.height - winborder;
+		int wb = (this.getHeight() / SCALE) - player.height - winborder;
 
 		// player limit to border window
 		if (player.x < wl)
@@ -350,7 +357,7 @@ public class Game extends JPanel {
 				if (layers[o.layer - 1]) {
 					o.draw(this, g);
 					if (debug) {
-						RenderHelper.drawDebug(g, o);
+						RenderHelper.drawDebug(g, o, debugFont);
 					}
 				}
 			}
@@ -365,26 +372,6 @@ public class Game extends JPanel {
 		if (help) {
 			RenderHelper.displayHelp(this, g, 10, 20);
 		}
-	}
-
-	/**
-	 * Display debug information for the game Object.
-	 * 
-	 * @param g
-	 *            the graphic interface to use to draw things
-	 * @param o
-	 *            the object to be debugged.
-	 */
-	private void drawDebug(Graphics2D g, GameObject o) {
-		g.setColor(new Color(0.5f, .5f, .5f, .8f));
-		g.fillRect((int) o.x + o.width + 6, (int) o.y - 8, 150, 50);
-		g.setColor(Color.YELLOW);
-		g.drawRect((int) o.x, (int) o.y, o.width, o.height);
-		g.drawRect((int) o.x + o.width + 6, (int) o.y - 8, 150, 50);
-		// g.setColor(Color.BLACK);
-		g.drawString(o.name, o.x + o.width + 10, o.y);
-		g.drawString("pos(" + o.x + "," + o.y + ")", o.x + o.width + 10, o.y + 16);
-		g.drawString("spd(" + o.dx + "," + o.dy + ")", o.x + o.width + 10, o.y + 32);
 	}
 
 	private void clearBuffer(Graphics2D g) {

@@ -64,7 +64,7 @@ public class GameObject {
 	/**
 	 * Size of this object.
 	 */
-	public int width = 32, height = 32;
+	public int width = 16, height = 16;
 	/**
 	 * Rendering depth and priority.
 	 */
