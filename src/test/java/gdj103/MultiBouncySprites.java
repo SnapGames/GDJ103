@@ -104,6 +104,9 @@ public class MultiBouncySprites {
 			case KeyEvent.VK_F1:
 				showHelp = !showHelp;
 				break;
+			case KeyEvent.VK_F11:
+				
+				break;
 			}
 
 		}
