@@ -72,7 +72,7 @@ public class Game extends JPanel {
 	/**
 	 * Flag to display Help.
 	 */
-	private boolean help = false;
+	private boolean help = true;
 
 	/**
 	 * Flag to activate screenshot recording.
