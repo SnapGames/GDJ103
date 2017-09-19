@@ -1,5 +1,11 @@
 /**
+ * SnapGames
  * 
+ * Game Development Java
+ * 
+ * gdj103
+ * 
+ * @year 2017
  */
 package com.snapgames.gdj.gdj103;
 
@@ -8,7 +14,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 
 /**
- * @author frederic
+ * A class to help on rendering things about text and some special debug info.
+ * 
+ * @author Frédéric Delorme
  *
  */
 public class RenderHelper {
@@ -91,8 +99,10 @@ public class RenderHelper {
 		g.drawLine((int) o.x + o.width, (int) o.y + o.height, (int) pane_x + link, pane_y + link);
 
 		g.drawString(o.name, pane_x + link + pane_padding, pane_y + link + fontHeight);
-		g.drawString(String.format("pos:(%4.2f,%4.2f)", o.x, o.y), pane_x + link + pane_padding, pane_y + link + 2 * fontHeight);
-		g.drawString(String.format("spd:(%4.2f,%4.2f)", o.dx, o.dy), pane_x + link + pane_padding, pane_y + link + 3 * fontHeight);
+		g.drawString(String.format("pos:(%4.2f,%4.2f)", o.x, o.y), pane_x + link + pane_padding,
+				pane_y + link + 2 * fontHeight);
+		g.drawString(String.format("spd:(%4.2f,%4.2f)", o.dx, o.dy), pane_x + link + pane_padding,
+				pane_y + link + 3 * fontHeight);
 		g.drawString(String.format("lyr,prio(:(%d,%d)", o.layer, o.priority), pane_x + link + pane_padding,
 				pane_y + link + 4 * fontHeight);
 	}

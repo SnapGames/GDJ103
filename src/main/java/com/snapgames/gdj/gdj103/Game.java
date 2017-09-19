@@ -28,7 +28,6 @@ import javax.swing.JPanel;
  * @author Frédéric Delorme
  *
  */
-@SuppressWarnings("serial")
 public class Game extends JPanel {
 
 	public final static int WIDTH = 320;
@@ -73,7 +72,7 @@ public class Game extends JPanel {
 	/**
 	 * Flag to display Help.
 	 */
-	private boolean help = false;
+	private boolean help = true;
 
 	/**
 	 * Flag to activate screenshot recording.
@@ -262,12 +261,15 @@ public class Game extends JPanel {
 				screenshot = true;
 				break;
 			case KeyEvent.VK_NUMPAD1:
+			case KeyEvent.VK_1:
 				layers[0] = !layers[0];
 				break;
 			case KeyEvent.VK_NUMPAD2:
+			case KeyEvent.VK_2:
 				layers[1] = !layers[1];
 				break;
 			case KeyEvent.VK_NUMPAD3:
+			case KeyEvent.VK_3:
 				layers[2] = !layers[2];
 				break;
 			default:
