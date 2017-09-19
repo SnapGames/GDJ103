@@ -14,6 +14,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
@@ -59,7 +62,10 @@ public class MultiBouncySprites {
 
 	}
 
+	public Rectangle prevWindowSize;
+
 	public class InputHandler implements KeyListener {
+
 		@Override
 		public void keyTyped(KeyEvent e) {
 		}
@@ -105,10 +111,42 @@ public class MultiBouncySprites {
 				showHelp = !showHelp;
 				break;
 			case KeyEvent.VK_F11:
-				
+				if (isFullScreenCapable) {
+					isFullScreen = !isFullScreen;
+					switchFullScreenMode(frame, canvas, isFullScreen);
+				} else {
+					System.err.println("Full screen mode is not possibe on this device");
+				}
 				break;
 			}
 
+		}
+
+		/**
+		 * Switch a frame between windowed to full screen mode, and reset focus to canvas.
+		 * 
+		 * @param frame
+		 * @param canvas
+		 * @param inFullScreenMode
+		 */
+		public void switchFullScreenMode(JFrame frame, Canvas canvas, boolean inFullScreenMode) {
+			frame.setVisible(false);
+			frame.setResizable(false);
+			frame.dispose();
+			if (inFullScreenMode) {
+				// Switch to fullscreen mode
+				frame.dispose();
+				frame.setUndecorated(true);
+				prevWindowSize = new Rectangle(frame.getX(), frame.getY(), frame.getWidth(), frame.getHeight());
+				device.setFullScreenWindow(frame);
+			} else {
+				// Switch to windowed mode
+				frame.setUndecorated(false);
+				frame.setResizable(true);
+				frame.setBounds(prevWindowSize);
+			}
+			frame.setVisible(true);
+			canvas.requestFocus();
 		}
 
 		@Override
@@ -122,12 +160,10 @@ public class MultiBouncySprites {
 		private long lastSecond = 0;
 		private int frames = 0;
 
-		
 		public GameLoop() {
 			super();
 		}
-		
-		
+
 		public void init(MultiBouncySprites game) {
 			targetFpsTime = (1000.0f / game.targetFps);
 			lastTime = 0;
@@ -190,6 +226,9 @@ public class MultiBouncySprites {
 
 	private boolean isMute = false;
 	private boolean isManualyMute = false;
+	private boolean isFullScreenCapable = false;
+	private boolean isFullScreen = false;
+	private int prevX, prevY, prevWidth, prevHeight;
 
 	/**
 	 * FPS counter for on-screen display
@@ -220,6 +259,14 @@ public class MultiBouncySprites {
 	 * Resource to play bouncy sound.
 	 */
 	private Clip bounce;
+
+	private GraphicsEnvironment env;
+	private GraphicsDevice device;
+
+	/**
+	 * the JFrame containing our game.
+	 */
+	private JFrame frame = null;
 	/**
 	 * Canvas containing all the game mechanism.
 	 */
@@ -236,7 +283,10 @@ public class MultiBouncySprites {
 	 */
 	public MultiBouncySprites() {
 
-		JFrame frame = new JFrame("Bouncy Sprite");
+		env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		device = env.getDefaultScreenDevice();
+
+		frame = new JFrame("Multi-Bouncy Sprites");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIgnoreRepaint(true);
 		frame.setResizable(true);
@@ -253,6 +303,7 @@ public class MultiBouncySprites {
 		canvas.requestFocus();
 		canvas.createBufferStrategy(2);
 		strategy = canvas.getBufferStrategy();
+		isFullScreenCapable = device.isFullScreenSupported();
 	}
 
 	/**
